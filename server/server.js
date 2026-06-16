@@ -20,15 +20,26 @@ import { contactRouter } from './routes/contact.js';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT_DIR = path.join(__dirname, '..');
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+// Railway / reverse proxy : nécessaire pour récupérer l'IP cliente et le bon protocole
+app.set('trust proxy', 1);
 
 app.use(cors());
 app.use(express.json({ limit: '2mb' }));
 
-// Fichiers statiques : images uploadées + interface d'administration
+// Fichiers statiques : images uploadées + interface d'administration + site vitrine
 app.use('/uploads', express.static(UPLOAD_DIR));
 app.use('/admin', express.static(path.join(__dirname, 'public', 'admin')));
+// Sert les fichiers du site vitrine (index.html, adc-frontend.js, etc.) à la racine
+app.use(
+  express.static(ROOT_DIR, {
+    index: 'index.html',
+    extensions: ['html'],
+  })
+);
 
 // API
 app.use('/api/auth', authRouter);
@@ -40,12 +51,11 @@ app.use('/api/events', eventsRouter);
 app.use('/api/gallery', galleryRouter);
 app.use('/api/contact', contactRouter);
 
-app.get('/', (req, res) => res.redirect('/admin'));
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
-// Sert la page vitrine (standalone) en même origine que l'API
+// Alias historique : /site sert également la vitrine
 app.get('/site', (req, res) =>
-  res.sendFile(path.join(__dirname, '..', 'index.html'))
+  res.sendFile(path.join(ROOT_DIR, 'index.html'))
 );
 
 // Gestion centralisée des erreurs (Multer, validation Mongoose, etc.)

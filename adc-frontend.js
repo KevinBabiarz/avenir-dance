@@ -19,9 +19,16 @@
   'use strict';
 
   /* ---------- Configuration ---------- */
-  var API_BASE = (typeof window.ADC_API === 'string')
-    ? window.ADC_API.replace(/\/+$/, '')
-    : 'http://localhost:4000';
+  // Priorité : window.ADC_API explicite > même origine (production) > localhost (dev hors-serveur)
+  var API_BASE;
+  if (typeof window.ADC_API === 'string' && window.ADC_API) {
+    API_BASE = window.ADC_API.replace(/\/+$/, '');
+  } else if (window.location && window.location.protocol.indexOf('http') === 0) {
+    API_BASE = window.location.origin.replace(/\/+$/, '');
+  } else {
+    // Ouverture via file:// → on retombe sur le serveur local de développement
+    API_BASE = 'http://localhost:4000';
+  }
 
   /* ---------- État local ---------- */
   var state = {
