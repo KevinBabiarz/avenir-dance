@@ -34,23 +34,46 @@ app.set('trust proxy', 1);
 //   FRONTEND_URL=https://www.avenircrazydance.be,https://avenircrazydance.be
 const allowedOrigins = (process.env.FRONTEND_URL || '')
   .split(',')
-  .map((o) => o.trim())
+  .map((o) => o.trim().replace(/\/+$/, ''))
   .filter(Boolean);
 
-app.use(
-  cors({
-    origin: (origin, cb) => {
-      // Requêtes same-origin (admin servi par Railway), Postman, curl, etc. → pas d'origin
-      if (!origin) return cb(null, true);
-      // Si aucune liste blanche n'est définie, on autorise tout (mode dev / migration)
-      if (allowedOrigins.length === 0) return cb(null, true);
-      // L'admin Railway et /site doivent toujours fonctionner même si on filtre
-      if (allowedOrigins.includes(origin)) return cb(null, true);
-      return cb(new Error(`Origine non autorisée par CORS : ${origin}`));
-    },
-    credentials: true,
-  })
-);
+// On autorise toujours le domaine du serveur lui-même (Railway, domaines custom)
+// pour que l'admin (/admin) et /site fonctionnent quel que soit l'host.
+const selfDomains = new Set();
+if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+  selfDomains.add(`https://${process.env.RAILWAY_PUBLIC_DOMAIN}`);
+}
+if (process.env.RAILWAY_STATIC_URL) {
+  selfDomains.add(process.env.RAILWAY_STATIC_URL.replace(/\/+$/, ''));
+}
+if (process.env.PUBLIC_URL) {
+  selfDomains.add(process.env.PUBLIC_URL.replace(/\/+$/, ''));
+}
+
+const corsOptions = {
+  origin: (origin, cb) => {
+    // Requêtes same-origin (admin servi par Railway), Postman, curl, etc. → pas d'origin
+    if (!origin) return cb(null, true);
+    const clean = origin.replace(/\/+$/, '');
+    // Toujours autoriser le domaine du serveur lui-même (admin, /site, etc.)
+    if (selfDomains.has(clean)) return cb(null, true);
+    // Si aucune liste blanche n'est définie, on autorise tout (mode dev / migration)
+    if (allowedOrigins.length === 0) return cb(null, true);
+    if (allowedOrigins.includes(clean)) return cb(null, true);
+    // Origine refusée : on renvoie false (pas d'erreur 500) → le navigateur affichera
+    // un message CORS clair au lieu d'un status:null trompeur.
+    console.warn(`[CORS] Origine refusée : ${origin}`);
+    return cb(null, false);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400,
+};
+
+app.use(cors(corsOptions));
+// Répond aux requêtes preflight OPTIONS pour toutes les routes
+app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '2mb' }));
 
 // Fichiers statiques : images uploadées + interface d'administration + site vitrine
