@@ -27,7 +27,30 @@ const PORT = process.env.PORT || 4000;
 // Railway / reverse proxy : nécessaire pour récupérer l'IP cliente et le bon protocole
 app.set('trust proxy', 1);
 
-app.use(cors());
+// CORS : autorise le(s) domaine(s) du frontend.
+// Définissez FRONTEND_URL dans les variables Railway, par ex :
+//   FRONTEND_URL=https://www.avenircrazydance.be
+// Plusieurs origines possibles via virgules :
+//   FRONTEND_URL=https://www.avenircrazydance.be,https://avenircrazydance.be
+const allowedOrigins = (process.env.FRONTEND_URL || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, cb) => {
+      // Requêtes same-origin (admin servi par Railway), Postman, curl, etc. → pas d'origin
+      if (!origin) return cb(null, true);
+      // Si aucune liste blanche n'est définie, on autorise tout (mode dev / migration)
+      if (allowedOrigins.length === 0) return cb(null, true);
+      // L'admin Railway et /site doivent toujours fonctionner même si on filtre
+      if (allowedOrigins.includes(origin)) return cb(null, true);
+      return cb(new Error(`Origine non autorisée par CORS : ${origin}`));
+    },
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: '2mb' }));
 
 // Fichiers statiques : images uploadées + interface d'administration + site vitrine

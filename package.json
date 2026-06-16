@@ -9,6 +9,9 @@
     "dev": "node --watch server/server.js",
     "seed": "node server/seed.js"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "keywords": [
     "dance",
     "admin",

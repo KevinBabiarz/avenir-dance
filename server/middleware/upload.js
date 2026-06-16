@@ -4,7 +4,11 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
+// En production (Railway), définissez UPLOAD_DIR vers un Volume persistant,
+// par ex. /data/uploads. Par défaut : ./server/uploads (local).
+const UPLOAD_DIR = process.env.UPLOAD_DIR
+  ? path.resolve(process.env.UPLOAD_DIR)
+  : path.join(__dirname, '..', 'uploads');
 
 // Crée le dossier uploads s'il n'existe pas
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
