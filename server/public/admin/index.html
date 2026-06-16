@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin · Avenir Crazy Dance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./admin.css" />
+</head>
+<body>
+
+  <!-- ===== Écran de connexion ===== -->
+  <div id="login-screen" class="login-screen">
+    <form id="login-form" class="login-card">
+      <div class="brand">
+        <span class="brand-name">Avenir<span class="dot">.</span></span>
+        <span class="brand-sub">Crazy Dance — Admin</span>
+      </div>
+      <h1>Connexion</h1>
+      <label>E-mail
+        <input type="email" name="email" autocomplete="username" required placeholder="admin@avenircrazydance.be" />
+      </label>
+      <label>Mot de passe
+        <input type="password" name="password" autocomplete="current-password" required placeholder="••••••••" />
+      </label>
+      <div id="login-error" class="form-error" hidden></div>
+      <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
+    </form>
+  </div>
+
+  <!-- ===== Application admin ===== -->
+  <div id="app" class="app" hidden>
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-name">Avenir<span class="dot">.</span></span>
+        <span class="brand-sub">Crazy Dance</span>
+      </div>
+      <nav id="nav" class="nav">
+        <button data-section="courses" class="nav-item active">Cours</button>
+        <button data-section="teachers" class="nav-item">Professeurs</button>
+        <button data-section="posts" class="nav-item">Blog</button>
+        <button data-section="events" class="nav-item">Évènements</button>
+        <button data-section="gallery" class="nav-item">Galerie</button>
+      </nav>
+      <div class="sidebar-footer">
+        <span id="user-email" class="user-email"></span>
+        <button id="logout" class="btn btn-ghost btn-sm">Déconnexion</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="main-header">
+        <div>
+          <h1 id="section-title">Cours</h1>
+          <p id="section-desc" class="section-desc"></p>
+        </div>
+        <button id="add-btn" class="btn btn-primary">+ Ajouter</button>
+      </header>
+      <div id="list" class="list"></div>
+    </main>
+  </div>
+
+  <!-- ===== Modale de formulaire ===== -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-backdrop"></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="modal-title">Élément</h2>
+        <button id="modal-close" class="modal-close" aria-label="Fermer">✕</button>
+      </div>
+      <form id="entity-form" class="entity-form"></form>
+      <div class="modal-foot">
+        <div id="form-error" class="form-error" hidden></div>
+        <div class="modal-actions">
+          <button id="cancel-btn" type="button" class="btn btn-ghost">Annuler</button>
+          <button id="save-btn" type="submit" form="entity-form" class="btn btn-primary">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="./admin.js"></script>
+</body>
+</html>
+

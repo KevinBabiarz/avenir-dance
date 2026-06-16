@@ -1,0 +1,30 @@
+{
+  "name": "avenir-crazy-dance-admin",
+  "version": "1.0.0",
+  "description": "Interface d'administration et API MongoDB pour le studio Avenir Crazy Dance (cours, professeurs, blog, évènements, galerie).",
+  "main": "server/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js",
+    "seed": "node server/seed.js"
+  },
+  "keywords": [
+    "dance",
+    "admin",
+    "mongodb",
+    "express"
+  ],
+  "author": "Avenir Crazy Dance",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.22.1",
+    "multer": "^2.1.1",
+    "nodemailer": "^8.0.11"
+  }
+}
